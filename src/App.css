@@ -1,4 +1,4 @@
-.App {
+/*.App {
   text-align: center;
 }
 
@@ -25,4 +25,22 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+*/
+
+/*.crypto-name {
+  float:left
+}
+
+.current-convert {
+  float:right
+}
+*/
+/*input, label {
+    display:block;
+    text-align:center
+}*/
+
+form, div {
+  text-align: center
 }
