@@ -15,6 +15,7 @@ import 'react-select/dist/react-select.css';
 
 
 
+
 class App extends Component {
 
   constructor(props) {
@@ -22,12 +23,13 @@ class App extends Component {
     this.state = {
       initFromCurrency: "",
       initToCurrency: "",
-      moneyToConvert: 1,
+      moneyToConvert: "",
       convertedPrice: "",
       showPriceBool: false,
       cryptoCurrentPrice: 0,
       coinlist: [{value: 0, label: "Loading..."}],
-      currencylist: [{value: 0, label: "USD"}, {value: 0, label: "EUR"}]
+      currencylist: [{value: 0, label: "USD"}, {value: 0, label: "EUR"}],
+      switchOrder: false
      }
    }
 
@@ -61,7 +63,7 @@ class App extends Component {
       });
       var s = coins_full_name.sort()
       var t = s[0].replace(/\*/g, '').trim()
-      this.setState({ coinlist: obj, initToCurrency: [{value: 0, label:t}], initFromCurrency: [{value: 0, label:"USD"}] });
+      this.setState({ coinlist: obj });
       })
 
     }, 1000)
@@ -86,9 +88,16 @@ class App extends Component {
   handleClick1 = () => {
 
 
+
+
+    let amount = this.state.moneyToConvert
     let crypto = this.state.initFromCurrency.label.match(/\(([^)]+)\)/)[1]
     let curr = this.state.initToCurrency.label
-    let amount = this.state.moneyToConvert
+
+    if (!amount) {
+      amount = ""
+    }
+    
     //console.log(crypto, curr, amount )
     this.setState({showPriceBool: true})
 
@@ -96,32 +105,39 @@ class App extends Component {
     let url = 'https://min-api.cryptocompare.com/data/price?fsym=' + crypto + '&tsyms=' + curr 
 
 
-    console.log(amount)
-
-    axios.get(url)
-      .then(res => {
-        let curr_to_dollars = res.data[curr] * amount
-        //console.log(res.data[curr])
-        this.setState({
-          convertedPrice: curr_to_dollars.toLocaleString(), 
-          cryptoCurrentPrice: res.data[curr].toLocaleString(),
+    //console.log(amount)
+    if (!this.state.switchOrder) {
+      axios.get(url)
+        .then(res => {
+          let curr_to_dollars = res.data[curr] * amount
+          //console.log(res.data[curr])
+          this.setState({
+            convertedPrice: curr_to_dollars.toLocaleString(), 
+            cryptoCurrentPrice: res.data[curr].toLocaleString(),
+          })
         })
-      })
+    } else {
+      axios.get(url)
+        .then(res => {
+          let curr_to_dollars = amount / res.data[curr] 
+          console.log(curr_to_dollars)
+          this.setState({
+            convertedPrice: curr_to_dollars, 
+            cryptoCurrentPrice: res.data[curr].toLocaleString(),
+          })
+        })
+    }
 
 
   }
   update_amount_to_convert = (e) => {
 
-
-    if ( Number.isNaN(e.target.value)) {
-      console.log(' number is nan --- need to reassign ')
-      this.setState({moneyToConvert: 1},this.handleClick1);
-    } else {
-      this.setState({moneyToConvert: parseInt(e.target.value)},this.handleClick1);
-    }
-     
+    // !e.target.value ? 
+    // this.setState({moneyToConvert: 0},this.handleClick1) : 
+    this.setState({moneyToConvert: parseInt(e.target.value)},this.handleClick1);
 
 
+  
 
       
 
@@ -132,6 +148,10 @@ class App extends Component {
     //console.log(e.target.value)
   }
 
+
+transfer = () => {
+  this.setState({switchOrder: !this.state.switchOrder})
+}
 
 
 
@@ -151,16 +171,17 @@ class App extends Component {
 
       if (options) {
         return (
-          <h4> <label > From Cryptocurrency <br /> 
-           <Select
-            name="form-field-name"
-            value={this.state.initFromCurrency}
-            options={options}
-            onChange={this.handleChangeFromCrypto}
-            placeholder="From..."
-          />
-
-          </label> </h4>
+          <div className='search-bar'> 
+            <h4 className='dropdown-label-left'>  From Cryptocurrency 
+             <Select
+              className="from-currency"
+              value={this.state.initFromCurrency}
+              options={options}
+              onChange={this.handleChangeFromCrypto}
+              placeholder="From..."
+            />
+            </h4>
+          </div>
           )
       }
       return <div> Loading </div>
@@ -171,16 +192,17 @@ class App extends Component {
 
       if (options) {
         return (
-          <h4> <label > To Currency <br /> 
-           <Select
-            name="form-field-name"
-            value={this.state.initToCurrency}
-            options={options}
-            onChange={this.handleChangeToCurrency}
-            placeholder= "...To"
-          />
-
-          </label> </h4>
+          <div className='search-bar'> 
+            <h4 className='dropdown-label-right'> To Currency  
+             <Select
+              className="to-currency"
+              value={this.state.initToCurrency}
+              options={options}
+              onChange={this.handleChangeToCurrency}
+              placeholder= "...To"
+            />
+             </h4>
+          </div>
           )
       }
       return <div> Loading </div>
@@ -201,13 +223,34 @@ class App extends Component {
 
       <div> 
 
+        <form> 
+
+
         <h4> <label > Enter an Coin Amount <br />
-          <input value={this.state.moneyToConvert} type="text" placeholder= "20" onChange={this.update_amount_to_convert} />
+          <input value={this.state.moneyToConvert} type="number" step="0.01" placeholder= "20" onChange={this.update_amount_to_convert} />
         </label> </h4>
+        {this.state.switchOrder ? 
 
 
-        <FromCryptoCurrency options={coinlist}/>
-        <ToCurrency options={currencyList} />
+
+          <div className='both-search-bars'>
+            <ToCurrency options={currencyList} />
+          <FromCryptoCurrency options={coinlist}/>
+          
+        </div> 
+
+        :
+        <div className='both-search-bars'>
+          <FromCryptoCurrency options={coinlist}/>
+          <ToCurrency options={currencyList} />
+        </div>
+        }
+
+        <p>
+        <button onClick={this.transfer} type="button" class="btn btn-default btn-sm">
+          <span class="glyphicon glyphicon-transfer"></span> Transfer 
+        </button>
+        </p>
 
 
 
@@ -223,6 +266,8 @@ class App extends Component {
           </div>
 
           }
+
+        </form>
 
 
       </div>

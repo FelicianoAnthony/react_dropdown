@@ -41,6 +41,47 @@
     text-align:center
 }*/
 
-form, div {
-  text-align: center
+
+
+.from-currency {
+  width: 200px;
+/*  float: left;*/
+/*  display:block*/
 }
+
+.to-currency   {
+  width: 200px;
+/*  float:right;*/
+/*  display:block;*/
+/*  margin-right: -80%*/
+}
+
+div.search-bar {
+  display:inline-block;
+}
+
+h4.dropdown-label-right {
+  margin-left: 30%
+}
+
+form {
+/*  margin-left: 30%*/
+
+  flex-direction: row;
+  justify-content: center;
+
+  text-align: center;
+
+
+}
+
+button {
+/*margin-top: -10%*/
+
+
+}
+
+
+
+
+
