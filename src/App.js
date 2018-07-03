@@ -20,7 +20,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      initFromCurrency:"",
+      initFromCurrency: "",
       initToCurrency: "",
       moneyToConvert: 0,
       convertedPrice: 0,
@@ -51,10 +51,12 @@ class App extends Component {
       for (var key in coins_objects) {
         coins_full_name.push(coins_objects[key].FullName)
       }
+      console.log(coins_full_name)
+
       
       // add those full coin names to obj 
       coins_full_name.sort().map((currElement, index) => {
-        obj.push({value: index, label: currElement})
+        obj.push({value: index, label: currElement.replace(/\*/g, '').trim()})
         //console.log("key",index, "value", currElement)
       });
 
@@ -90,7 +92,7 @@ class App extends Component {
     let curr = this.state.initToCurrency.label
     let amount = this.state.moneyToConvert
     console.log(crypto, curr, amount )
-    this.setState({showPriceBool: !this.state.showPriceBool})
+    this.setState({showPriceBool: true})
 
     //'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=BTC,USD,EUR'
     let url = 'https://min-api.cryptocompare.com/data/price?fsym=' + crypto + '&tsyms=' + curr 
@@ -126,6 +128,7 @@ class App extends Component {
             value={this.state.initFromCurrency}
             options={options}
             onChange={this.handleChangeFromCrypto}
+            placeholder="From..."
           />
 
           </label> </h4>
@@ -145,6 +148,7 @@ class App extends Component {
             value={this.state.initToCurrency}
             options={options}
             onChange={this.handleChangeToCurrency}
+            placeholder= "...To"
           />
 
           </label> </h4>
@@ -169,7 +173,7 @@ class App extends Component {
       <div> 
 
         <h4> <label > Enter an Amount <br />
-          <input value={this.state.amount_to_convert} onChange={this.update_amount_to_convert} />
+          <input value={this.state.moneyToConvert} onChange={this.update_amount_to_convert} />
         </label> </h4>
 
 
@@ -180,11 +184,11 @@ class App extends Component {
           <button onClick={this.handleClick} id="submitbutton" type="button">Convert!</button>
         </p>
 
-
-        {!this.state.showPriceBool ? null :
+{/*  once first conversion is done .. bool can never be false again         */}
+        {this.state.showPriceBool == false ? null :
 
           <div> 
-            <h4> {this.state.showPriceBool.label} Current Price </h4>
+            <h4> {this.state.initFromCurrency.label} Current Price </h4>
             <label> {this.state.cryptoCurrentPrice} </label>
 
             <h4> Price in {this.state.initToCurrency.label} </h4>
