@@ -22,8 +22,8 @@ class App extends Component {
     this.state = {
       initFromCurrency: "",
       initToCurrency: "",
-      moneyToConvert: 0,
-      convertedPrice: 0,
+      moneyToConvert: "",
+      convertedPrice: "",
       showPriceBool: false,
       cryptoCurrentPrice: 0,
       coinlist: [{value: 0, label: "Loading..."}],
@@ -59,8 +59,9 @@ class App extends Component {
         obj.push({value: index, label: currElement.replace(/\*/g, '').trim()})
         //console.log("key",index, "value", currElement)
       });
-
-      this.setState({ coinlist: obj });
+      var s = coins_full_name.sort()
+      var t = s[0].replace(/\*/g, '').trim()
+      this.setState({ coinlist: obj, initToCurrency: [{value: 0, label:t}], initFromCurrency: [{value: 0, label:"USD"}] });
       })
 
     }, 1000)
@@ -82,11 +83,7 @@ class App extends Component {
   }
 
   update_amount_to_convert = (e) => {
-    this.setState({moneyToConvert: e.target.value})
-    //console.log(e.target.value)
-  }
-
-  handleClick = () => {
+    
 
     let crypto = this.state.initFromCurrency.label.match(/\(([^)]+)\)/)[1]
     let curr = this.state.initToCurrency.label
@@ -101,8 +98,19 @@ class App extends Component {
       .then(res => {
         let curr_to_dollars = res.data[curr] * parseInt(amount)
         console.log(res.data[curr])
-        this.setState({convertedPrice: curr_to_dollars.toLocaleString(), cryptoCurrentPrice: res.data[curr].toLocaleString()})
+        this.setState({
+          convertedPrice: curr_to_dollars.toLocaleString(), 
+          cryptoCurrentPrice: res.data[curr].toLocaleString(),
+        })
       })
+      this.setState({moneyToConvert: e.target.value})
+
+    //console.log(e.target.value)
+  }
+
+  handleClick = () => {
+
+
   }
 
 
@@ -172,8 +180,8 @@ class App extends Component {
 
       <div> 
 
-        <h4> <label > Enter an Amount <br />
-          <input value={this.state.moneyToConvert} onChange={this.update_amount_to_convert} />
+        <h4> <label > Enter an Coin Amount <br />
+          <input value={this.state.moneyToConvert} type="text" placeholder= "20" onChange={this.update_amount_to_convert} />
         </label> </h4>
 
 
@@ -188,7 +196,7 @@ class App extends Component {
         {this.state.showPriceBool == false ? null :
 
           <div> 
-            <h4> {this.state.initFromCurrency.label} Current Price </h4>
+            <h4> {this.state.initFromCurrency.label} Current Price  -- {this.state.moneyToConvert}</h4>
             <label> {this.state.cryptoCurrentPrice} </label>
 
             <h4> Price in {this.state.initToCurrency.label} </h4>
