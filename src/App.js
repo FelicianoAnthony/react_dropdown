@@ -4,26 +4,32 @@ import './App.css';
 //import Dropdown from './Dropdown';
 //https://stackoverflow.com/questions/40777325/how-to-get-the-key-of-a-selected-value-from-a-dropdown-in-reactjs
 import axios from 'axios';
+//import Select from 'react-virtualized-select';
+import Select from 'react-select';
+
+import 'react-select/dist/react-select.css';
+//import ' react-virtualized/styles.css'
+//import 'react-virtualized-select/styles.css'
+
+
 
 
 
 class App extends Component {
-  constructor(){
-    super()
+
+  constructor(props) {
+    super(props);
     this.state = {
-       currencylist: [
-        {"key": 0, "value": "USD"},
-        {"key": 1, "value": "EUR"}
-      ],
-       coinlist: [{"key": 0, "value:": "Loading..."}],
-       amount_to_convert: 0, // this is the amount the user has in a specific coin 
-       from_crypto: "", // crypto to convert 
-       to_currency: "USD", // currency to convert to 
-       show_price_in_currency: false, // toggle to show currency price 
-       crypto_price_in_currency: 0, // value of 1 crpyto coin * value in currency converted to 
-       crypto_curr_price:0 // price of 1 coin of crypto 
-    }
-  }
+      initFromCurrency:"",
+      initToCurrency: "",
+      moneyToConvert: 0,
+      convertedPrice: 0,
+      showPriceBool: false,
+      cryptoCurrentPrice: 0,
+      coinlist: [{value: 0, label: "Loading..."}],
+      currencylist: [{value: 0, label: "USD"}, {value: 0, label: "EUR"}]
+     }
+   }
 
 
   componentWillMount(){
@@ -37,8 +43,6 @@ class App extends Component {
       console.log('Our data is fetched');
       axios.get('https://www.cryptocompare.com/api/data/coinlist/')
       .then(res => {
-      //const coins = Object.keys(res.data.Data)
-
 
       // get coin objects then get full coin names 
       const coins_objects = res.data.Data
@@ -50,10 +54,9 @@ class App extends Component {
       
       // add those full coin names to obj 
       coins_full_name.sort().map((currElement, index) => {
-        obj.push({"key": index, "value": currElement})
-      //console.log("key": index, "value": currElement)
+        obj.push({value: index, label: currElement})
+        //console.log("key",index, "value", currElement)
       });
-
 
       this.setState({ coinlist: obj });
       })
@@ -63,46 +66,31 @@ class App extends Component {
 
 
   componentDidMount () {
-       this.getData()
+    this.getData()
   }
 
-
-
-  handleChangeCrypto = (e) => {
-    console.log(e.target.value);
-    var value = this.state.coinlist.filter(function(item) {
-      return item.key == e.target.value
-    })
-
-    this.setState({from_crypto: value[0].value.match(/\(([^)]+)\)/)[1]})
-    //console.log(this.state.from_crypto, ' in handleChangeCrypto');
+  handleChangeFromCrypto = (element) => {
+    this.setState({initFromCurrency: element  }); 
+    // if you do element.label then list item chosen won't appear in text box... 
   }
 
-
-  handleChangeCurrency = (e) => {
-    console.log(e.target.value);
-    var value = this.state.currencylist.filter(function(item) {
-      return item.key == e.target.value
-    })
-
-    this.setState({to_currency: value[0].value })
-    //console.log(value[0].value, 'in handleChangeCurrency');
+  handleChangeToCurrency= (element) => {
+    this.setState({initToCurrency: element});
+    // if you do element.label then list item chosen won't appear in text box... 
   }
-
 
   update_amount_to_convert = (e) => {
-    this.setState({amount_to_convert: e.target.value})
-    console.log(e.target.value)
-
+    this.setState({moneyToConvert: e.target.value})
+    //console.log(e.target.value)
   }
 
   handleClick = () => {
 
-    let crypto = this.state.from_crypto
-    let curr = this.state.to_currency
-    let amount = this.state.amount_to_convert
+    let crypto = this.state.initFromCurrency.label.match(/\(([^)]+)\)/)[1]
+    let curr = this.state.initToCurrency.label
+    let amount = this.state.moneyToConvert
     console.log(crypto, curr, amount )
-    this.setState({show_price_in_currency: !this.state.show_price_in_currency})
+    this.setState({showPriceBool: !this.state.showPriceBool})
 
     //'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=BTC,USD,EUR'
     let url = 'https://min-api.cryptocompare.com/data/price?fsym=' + crypto + '&tsyms=' + curr 
@@ -111,64 +99,103 @@ class App extends Component {
       .then(res => {
         let curr_to_dollars = res.data[curr] * parseInt(amount)
         console.log(res.data[curr])
-        this.setState({crypto_price_in_currency: curr_to_dollars.toLocaleString(), crypto_curr_price: res.data[curr].toLocaleString()})
+        this.setState({convertedPrice: curr_to_dollars.toLocaleString(), cryptoCurrentPrice: res.data[curr].toLocaleString()})
       })
   }
 
 
 
 
+
+
+
+
   render() {
+
+    var coinlist = this.state.coinlist
+    var currencyList = this.state.currencylist
+
+
+    const FromCryptoCurrency= ({ options }) => {
+
+      if (options) {
+        return (
+          <h4> <label > From Cryptocurrency <br /> 
+           <Select
+            name="form-field-name"
+            value={this.state.initFromCurrency}
+            options={options}
+            onChange={this.handleChangeFromCrypto}
+          />
+
+          </label> </h4>
+          )
+      }
+      return <div> Loading </div>
+    };
+
+
+    const ToCurrency = ({ options }) => {
+
+      if (options) {
+        return (
+          <h4> <label > To Currency <br /> 
+           <Select
+            name="form-field-name"
+            value={this.state.initToCurrency}
+            options={options}
+            onChange={this.handleChangeToCurrency}
+          />
+
+          </label> </h4>
+          )
+      }
+      return <div> Loading </div>
+    };
+   
+
+
+
+
 
 
     return (
 
 
-        <div>
-
-            <form> 
-
-              <h4> <label > Enter an Amount <br />
-                <input value={this.state.amount_to_convert} onChange={this.update_amount_to_convert} />
-              </label> </h4>
-
-              <h4> <label > From Cryptocurrency <br />
-              <select className="crypto-name" onChange={this.handleChangeCrypto}>
-                {this.state.coinlist.map(function(data, key){  return (
-                  <option key={key} value={data.key}>{data.value}</option> )
-                })}
-              </select>
-              </label> </h4>
 
 
-              <h4> <label > To Currency <br />
-              <select className="current-convert" onChange={this.handleChangeCurrency}>
-                {this.state.currencylist.map(function(data, key){  return (
-                  <option key={key} value={data.key}>{data.value}</option> )
-                })}
-              </select>
-              </label> </h4>
 
-              <p> 
-                <button onClick={this.handleClick} id="submitbutton" type="button">Convert!</button>
-              </p>
 
-          </form>
+      <div> 
 
-          {!this.state.show_price_in_currency ? null :
+        <h4> <label > Enter an Amount <br />
+          <input value={this.state.amount_to_convert} onChange={this.update_amount_to_convert} />
+        </label> </h4>
+
+
+        <FromCryptoCurrency options={coinlist}/>
+        <ToCurrency options={currencyList} />
+
+        <p> 
+          <button onClick={this.handleClick} id="submitbutton" type="button">Convert!</button>
+        </p>
+
+
+        {!this.state.showPriceBool ? null :
 
           <div> 
-            <h4> {this.state.from_crypto} Current Price </h4>
-            <label> {this.state.crypto_curr_price} </label>
+            <h4> {this.state.showPriceBool.label} Current Price </h4>
+            <label> {this.state.cryptoCurrentPrice} </label>
 
-            <h4> Price in {this.state.to_currency} </h4>
-            <label> {this.state.crypto_price_in_currency} </label>
+            <h4> Price in {this.state.initToCurrency.label} </h4>
+            <label> {this.state.convertedPrice} </label>
           </div>
 
           }
 
 
-        </div>
+      </div>
+
 
     );
   }
