@@ -22,7 +22,7 @@ class App extends Component {
     this.state = {
       initFromCurrency: "",
       initToCurrency: "",
-      moneyToConvert: "",
+      moneyToConvert: 1,
       convertedPrice: "",
       showPriceBool: false,
       cryptoCurrentPrice: 0,
@@ -82,36 +82,57 @@ class App extends Component {
     // if you do element.label then list item chosen won't appear in text box... 
   }
 
-  update_amount_to_convert = (e) => {
-    
+
+  handleClick1 = () => {
+
 
     let crypto = this.state.initFromCurrency.label.match(/\(([^)]+)\)/)[1]
     let curr = this.state.initToCurrency.label
     let amount = this.state.moneyToConvert
-    console.log(crypto, curr, amount )
+    //console.log(crypto, curr, amount )
     this.setState({showPriceBool: true})
 
     //'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=BTC,USD,EUR'
     let url = 'https://min-api.cryptocompare.com/data/price?fsym=' + crypto + '&tsyms=' + curr 
 
+
+    console.log(amount)
+
     axios.get(url)
       .then(res => {
-        let curr_to_dollars = res.data[curr] * parseInt(amount)
-        console.log(res.data[curr])
+        let curr_to_dollars = res.data[curr] * amount
+        //console.log(res.data[curr])
         this.setState({
           convertedPrice: curr_to_dollars.toLocaleString(), 
           cryptoCurrentPrice: res.data[curr].toLocaleString(),
         })
       })
-      this.setState({moneyToConvert: e.target.value})
+
+
+  }
+  update_amount_to_convert = (e) => {
+
+
+    if ( Number.isNaN(e.target.value)) {
+      console.log(' number is nan --- need to reassign ')
+      this.setState({moneyToConvert: 1},this.handleClick1);
+    } else {
+      this.setState({moneyToConvert: parseInt(e.target.value)},this.handleClick1);
+    }
+     
+
+
+
+      
+
+    // .then() -- state not getting updated fast enough 
+
+      
 
     //console.log(e.target.value)
   }
 
-  handleClick = () => {
 
-
-  }
 
 
 
@@ -188,9 +209,7 @@ class App extends Component {
         <FromCryptoCurrency options={coinlist}/>
         <ToCurrency options={currencyList} />
 
-        <p> 
-          <button onClick={this.handleClick} id="submitbutton" type="button">Convert!</button>
-        </p>
+
 
 {/*  once first conversion is done .. bool can never be false again         */}
         {this.state.showPriceBool == false ? null :
