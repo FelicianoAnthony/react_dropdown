@@ -60,7 +60,8 @@ class App extends Component {
       plotData: [],
       boolz: false,
       dateRange: [],
-      inputValue:""
+      inputValue:"",
+      flipDropdown: false 
      }
    }
 
@@ -346,6 +347,10 @@ class App extends Component {
       })
   }
 
+  handleFlip = () => {
+    this.setState({flipDropdown: !this.state.flipDropdown})
+  }
+
 
 
 
@@ -419,9 +424,21 @@ class App extends Component {
           <input value={this.state.moneyToConvert} onChange={this.update_amount_to_convert} />
         </label> </h4>
 
+        {!this.state.flipDropdown ? 
 
-        <FromCryptoCurrency options={coinlist}/>
-        <ToCurrency options={currencyList} />
+        <div> 
+          <FromCryptoCurrency options={coinlist}/>
+          <button onClick={this.handleFlip}> flip me </button> 
+          <ToCurrency options={currencyList} />
+        </div> :
+
+        <div>
+          <ToCurrency options={currencyList} />
+          <button onClick={this.handleFlip}> flip me </button> 
+          <FromCryptoCurrency options={coinlist}/>
+        </div> 
+
+        }
 
         <p> 
           <button onClick={this.handleClick} id="submitbutton" type="button">Convert!</button>
