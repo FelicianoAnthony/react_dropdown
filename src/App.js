@@ -429,13 +429,19 @@ class App extends Component {
 
         <div> 
           <FromCryptoCurrency options={coinlist}/>
-          <button onClick={this.handleFlip}> flip me </button> 
+{/*           <button onClick={this.handleFlip}> flip me </button>  */}
+
+          <button onClick={this.handleFlip} type="button" class="btn btn-default btn-sm">
+          <span class="glyphicon glyphicon-transfer"></span>  
+          </button>
           <ToCurrency options={currencyList} />
         </div> :
 
         <div>
           <ToCurrency options={currencyList} />
-          <button onClick={this.handleFlip}> flip me </button> 
+          <button onClick={this.handleFlip} type="button" class="btn btn-default btn-sm">
+          <span class="glyphicon glyphicon-transfer"></span>  
+          </button>
           <FromCryptoCurrency options={coinlist}/>
         </div> 
 
