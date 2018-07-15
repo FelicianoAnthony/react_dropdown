@@ -12,7 +12,35 @@ import 'react-select/dist/react-select.css';
 //import ' react-virtualized/styles.css'
 //import 'react-virtualized-select/styles.css'
 
+  const monthsDict = {
+    1: 31,
+    2: 28, 
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30, 
+    7: 31,
+    8: 31,
+    9: 30,
+    10: 31, 
+    11: 30,
+    12: 31
+  }
 
+  let monthNamesDict = {
+    1: 'January', 
+    2: 'February', 
+    3: 'March',
+    4: 'April',
+    5: 'May',
+    6: 'June',
+    7: 'July',
+    8: 'August',
+    9: 'September',
+    10: 'October',
+    11: 'November',
+    12: 'December'
+  }
 
 
 
@@ -42,147 +70,88 @@ class App extends Component {
   }
 
 
+  getPrev30Days = (dateStr, currYear) => {
+  // get previous 30 days from today's date 
+  // TAKE ARG FORMATTED LIKE '6 2' AND CHANGES IT TO '06 02' and returns array of previous 30 days depending on month 
 
-  makePlot = () =>  {
+    let month = dateStr.split(' ')[0] * 1
+    let prevMonth = month -1
+    let currDay = dateStr.split(' ')[1] * 1
 
-    let monthNamesDict = {
-      1: 'January', 
-      2: 'February', 
-      3: 'March',
-      4: 'April',
-      5: 'May',
-      6: 'June',
-      7: 'July',
-      8: 'August',
-      9: 'September',
-      10: 'October',
-      11: 'November',
-      12: 'December'
+    // number of days in current month
+    let daysInCurrMonth = monthsDict[month]
+    //30
 
+    // number of days to subtract from the end of the previous month 
+    let daysToTake = daysInCurrMonth - currDay
+      //5
+
+    // number of days in previous month 
+    let daysInPrevMonth = monthsDict[prevMonth]
+    //31
+
+     
+    //most important -- what day in previous month to start at 
+    let prevMonthStartDate = daysInPrevMonth - daysToTake
+      //26
+
+    //console.log(daysToTake, prevMonthStartDate, daysInPrevMonth, daysInCurrMonth)
+
+    if (month.toString().length === 1 ){
+      month = '0'+ month.toString()
     }
 
-    // TAKE ARG FORMATTED LIKE '6 2' AND CHANGES IT TO '06 02' and returns array of previous 30 days depending on month 
-    var prev30DaysArr =     
-    function getDates (dateStr, currYear) {
-
-      let monthsDict = {
-      1: 31,
-      2: 28, 
-      3: 31,
-      4: 30,
-      5: 31,
-      6: 30, 
-      7: 31,
-      8: 31,
-      9: 30,
-      10: 31, 
-      11: 30,
-      12: 31
+    //const prevMonth = ""
+    if (prevMonth.toString().length === 1 ){
+      prevMonth = '0'+ prevMonth.toString()
     }
 
+      // this is an array of days from previous month starting in the middle 
+    let prevMonthDaysArr = []
+    for (var i=prevMonthStartDate; i < daysInPrevMonth; i++) {
 
-      let month = dateStr.split(' ')[0] * 1
-      let prevMonth = month -1
-      let currDay = dateStr.split(' ')[1] * 1
-
-
-
-      // number of days in current month
-      let daysInCurrMonth = monthsDict[month]
-      //30
-
-      // number of days to subtract from the end of the previous month 
-      let daysToTake = daysInCurrMonth - currDay
-        //5
-
-      // number of days in previous month 
-      let daysInPrevMonth = monthsDict[prevMonth]
-      //31
-
-       
-      //most important -- what day in previous month to start at 
-      let prevMonthStartDate = daysInPrevMonth - daysToTake
-        //26
-
-      //console.log(daysToTake, prevMonthStartDate, daysInPrevMonth, daysInCurrMonth)
-
-      if (month.toString().length === 1 ){
-        month = '0'+ month.toString()
+      // to add 0 to singel digit #'s '
+      const elem = i.toString()
+      if (elem.length === 1) {
+        const monthDate = `${currYear}.${prevMonth}.0${i}`
+        prevMonthDaysArr.push(monthDate)
       }
-
-      //const prevMonth = ""
-      if (prevMonth.toString().length === 1 ){
-        prevMonth = '0'+ prevMonth.toString()
+      else {
+        const monthDate = `${currYear}.${prevMonth}.${i}`
+        prevMonthDaysArr.push(monthDate)
       }
-
-        // this is an array of days from previous month starting in the middle 
-      let prevMonthDaysArr = []
-      for (var i=prevMonthStartDate; i < daysInPrevMonth; i++) {
-
-        // to add 0 to singel digit #'s '
-        const elem = i.toString()
-        if (elem.length === 1) {
-          const monthDate = `${currYear}.${prevMonth}.0${i}`
-          prevMonthDaysArr.push(monthDate)
-        }
-        else {
-          const monthDate = `${currYear}.${prevMonth}.${i}`
-          prevMonthDaysArr.push(monthDate)
-        }
-      }
-
-      let currMonthDaysArr = []
-      for (var j=1; j <= currDay; j++) {
-        const elem = j.toString()
-        if (elem.length == 1) {
-          let monthDate = `${currYear}.${month}.0${j}`
-          currMonthDaysArr.push(monthDate)
-        } else {
-          let monthDate = `${currYear}.${month}.${j}`
-          currMonthDaysArr.push(monthDate)
-        }
-      }
-
-      let bothMonths = prevMonthDaysArr.concat(currMonthDaysArr)
-
-      let finalArr = []; 
-
-      for (var k=0; k < bothMonths.length-1; k++) {
-        if (k %  2 !== 0 ){
-          finalArr.push(bothMonths[k]) 
-        }
-      }
-
-      return finalArr
     }
 
+    let currMonthDaysArr = []
+    for (var j=1; j <= currDay; j++) {
+      const elem = j.toString()
+      if (elem.length == 1) {
+        let monthDate = `${currYear}.${month}.0${j}`
+        currMonthDaysArr.push(monthDate)
+      } else {
+        let monthDate = `${currYear}.${month}.${j}`
+        currMonthDaysArr.push(monthDate)
+      }
+    }
 
-    let nowDate = new Date();
-    let nowMonth = (nowDate.getMonth() + 1).toString()
-    let nowDay = nowDate.getDate().toString()
-    let nowYear = nowDate.getYear().toString()
+    let bothMonths = prevMonthDaysArr.concat(currMonthDaysArr)
 
-    //console.log(nowDate.getMonth() + 1, 'there')
+    let finalArr = []; 
 
+    for (var k=0; k < bothMonths.length-1; k++) {
+      if (k %  2 !== 0 ){
+        finalArr.push(bothMonths[k]) 
+      }
+    }
 
-
-    
-    let queryDate = `${nowMonth} ${nowDay}`
-
-
-    let unixFormat = prev30DaysArr(queryDate, '2018')
+    return finalArr
+  }
 
 
 
-
-
- 
-    
-
-
-    function formatTitle(finalArr, firstOrLastDay) {
-      // finalArr is array of unix timestamps to be plotted 
-      // firstOrLastDay is 'first' or 'last'
+  formatTitle = (finalArr, firstOrLastDay) => {
+    // finalArr is array of unix timestamps to be plotted 
+    // firstOrLastDay is 'first' or 'last'
 
     let whichDate = 0
     if (firstOrLastDay === 'first') {
@@ -205,22 +174,14 @@ class App extends Component {
     let finalFirstDate = `${firstDayMonthName} ${firstDayUnixDay}, ${firstDayUnixYear}`
 
     return finalFirstDate
-
-    }
-
-    let startDate = formatTitle(unixFormat, 'first')
-    let endDate = formatTitle(unixFormat, 'last')
-    let plotTitle = `${startDate} - ${endDate}`
-
-    //console.log(plotTitle)
- 
+  }
 
 
 
+  requestPlotData = (unixFormat, plotTitle) => {
 
     let coin = this.state.inputValue
     let url = 'https://min-api.cryptocompare.com/data/pricehistorical?fsym=' + coin + '&tsyms=USD,EUR&ts='
-
 
     let labelsArr = []
     let pricesArr = []
@@ -250,10 +211,7 @@ class App extends Component {
         })
       
     }
-
-    //console.log('pricesarr ', pricesArr, '\ndateArr ', dateArr )
     
-
     let dataObj = { labels: unixFormat, 
                 datasets: [
                   {
@@ -279,12 +237,38 @@ class App extends Component {
                           }
                         ]
                       }
-
    
     this.setState({plotData: dataObj, boolz:!this.state.boolz, dateRange: unixFormat})
+
   }
 
 
+  makePlot = () =>  {
+  // onClick function for click for plot button 
+
+
+    // get date 
+    let nowDate = new Date();
+    let nowMonth = (nowDate.getMonth() + 1).toString()
+    let nowDay = nowDate.getDate().toString()
+    let nowYear = nowDate.getYear().toString()
+
+    
+
+    // get prev 30 days 
+    let queryDate = `${nowMonth} ${nowDay}`
+    let unixFormat = this.getPrev30Days(queryDate, '2018')
+
+    // plot data 
+    let startDate = this.formatTitle(unixFormat, 'first')
+    let endDate = this.formatTitle(unixFormat, 'last')
+    let plotTitle = `${startDate} - ${endDate}`
+
+    this.requestPlotData(unixFormat, plotTitle)
+
+  }
+
+  // for generating coin list in dropdown
   getData(){
     let obj = []
     setTimeout(() => {
