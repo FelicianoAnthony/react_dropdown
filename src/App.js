@@ -53,7 +53,6 @@ class App extends Component {
       initToCurrency: "",
       moneyToConvert: 0,
       convertedPrice: 0,
-      showPriceBool: false,
       cryptoCurrentPrice: 0,
       coinlist: [{value: 0, label: "Loading..."}],
       currencylist: [{value: 0, label: "USD"}, {value: 0, label: "EUR"}],
@@ -319,8 +318,10 @@ class App extends Component {
   }
 
   update_amount_to_convert = (e) => {
-    this.setState({moneyToConvert: e.target.value})
+    this.setState({moneyToConvert: e.target.value}, this.handleClick)
     //console.log(e.target.value)
+
+     //this.setState({moneyToConvert: parseInt(e.target.value)},this.handleClick1);
   }
 
   handleClick = () => {
@@ -330,7 +331,7 @@ class App extends Component {
 
     let curr = this.state.initToCurrency.label
     let amount = this.state.moneyToConvert
-    console.log(crypto, curr, amount )
+    //console.log(crypto, curr, amount )
     this.setState({showPriceBool: true})
 
     //'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=BTC,USD,EUR'
@@ -445,7 +446,7 @@ class App extends Component {
         </p>
 
 {/*  once first conversion is done .. bool can never be false again         */}
-        {this.state.showPriceBool == false ? null :
+
 
           <div> 
             <h4> {this.state.initFromCurrency.label} Current Price </h4>
@@ -455,7 +456,7 @@ class App extends Component {
             <label> {this.state.convertedPrice} </label>
           </div>
 
-          }
+          
 
 
             {!this.state.boolz ? null: <div className="line-chart"> <Line data={data} /> </div>}
