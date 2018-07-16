@@ -213,30 +213,30 @@ class App extends Component {
     }
     
     let dataObj = { labels: unixFormat, 
-                datasets: [
-                  {
-                    label: 'Price of ' + coin + ' from ' + plotTitle,
-                    fill: true,
-                    lineTension: 0.1,
-                    backgroundColor: 'rgba(75,192,192,0.4)',
-                    borderColor: 'rgba(75,192,192,1)',
-                    borderCapStyle: 'butt',
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    borderJoinStyle: 'miter',
-                    pointBorderColor: 'rgba(75,192,192,1)',
-                    pointBackgroundColor: '#fff',
-                    pointBorderWidth: 1,
-                    pointHoverRadius: 5,
-                    pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-                    pointHoverBorderColor: 'rgba(220,220,220,1)',
-                    pointHoverBorderWidth: 2,
-                    pointRadius: 1,
-                    pointHitRadius: 10,
-                    data: pricesArr
-                          }
-                        ]
-                      }
+      datasets: [
+        {
+          label: 'Price of ' + coin + ' from ' + plotTitle,
+          fill: true,
+          lineTension: 0.1,
+          backgroundColor: 'rgba(75,192,192,0.4)',
+          borderColor: 'rgba(75,192,192,1)',
+          borderCapStyle: 'butt',
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: 'miter',
+          pointBorderColor: 'rgba(75,192,192,1)',
+          pointBackgroundColor: '#fff',
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+          pointHoverBorderColor: 'rgba(220,220,220,1)',
+          pointHoverBorderWidth: 2,
+          pointRadius: 1,
+          pointHitRadius: 10,
+          data: pricesArr
+                }
+              ]
+            }
    
     this.setState({plotData: dataObj, boolz:!this.state.boolz, dateRange: unixFormat})
 
@@ -419,7 +419,7 @@ class App extends Component {
 
 
 
-      <div> 
+      <div className="content"> 
 
         <h4> <label > Enter an Amount <br />
           <input value={this.state.moneyToConvert} onChange={this.update_amount_to_convert} />
@@ -427,40 +427,51 @@ class App extends Component {
 
         {!this.state.flipDropdown ? 
 
-        <div> 
-          <FromCryptoCurrency options={coinlist}/>
-{/*           <button onClick={this.handleFlip}> flip me </button>  */}
+        <div className="wrapper"> 
 
-          <button onClick={this.handleFlip} type="button" class="btn btn-default btn-sm">
-          <span class="glyphicon glyphicon-transfer"></span>  
-          </button>
-          <ToCurrency options={currencyList} />
+          <div className="col"> 
+            <FromCryptoCurrency options={coinlist}/>
+          </div> 
+
+          <div className="col">
+            <button onClick={this.handleFlip} type="button" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-transfer"></span>  
+            </button>
+          </div>
+
+          <div className="col">
+            <ToCurrency options={currencyList} />
+          </div>
+
         </div> :
 
-        <div>
-          <ToCurrency options={currencyList} />
-          <button onClick={this.handleFlip} type="button" class="btn btn-default btn-sm">
-          <span class="glyphicon glyphicon-transfer"></span>  
-          </button>
-          <FromCryptoCurrency options={coinlist}/>
-        </div> 
+        <div className="wrapper">
 
+          <div className="col"> 
+            <ToCurrency options={currencyList} />
+          </div> 
+
+          <div className="col">
+            <button onClick={this.handleFlip} type="button" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-transfer"></span>  
+            </button>
+          </div> 
+
+          <div className="col">
+            <FromCryptoCurrency options={coinlist}/>
+          </div>
+        </div> 
         }
 
-        <p> 
-          <button onClick={this.handleClick} id="submitbutton" type="button">Convert!</button>
-        </p>
-
-{/*  once first conversion is done .. bool can never be false again         */}
 
 
-          <div> 
-            <h4> {this.state.initFromCurrency.label} Current Price </h4>
-            <label> {this.state.cryptoCurrentPrice} </label>
+        <div> 
+          <h4> {this.state.initFromCurrency.label} Current Price </h4>
+          <label> {this.state.cryptoCurrentPrice} </label>
 
-            <h4> Price in {this.state.initToCurrency.label} </h4>
-            <label> {this.state.convertedPrice} </label>
-          </div>
+          <h4> Price in {this.state.initToCurrency.label} </h4>
+          <label> {this.state.convertedPrice} </label>
+        </div>
 
           
 
