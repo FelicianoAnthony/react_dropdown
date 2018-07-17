@@ -1,22 +1,13 @@
 import React, { Component } from 'react';
-import './App.css';
-//import SimpleCard from './SimpleCard';
-//import Dropdown from './Dropdown';
-//https://stackoverflow.com/questions/40777325/how-to-get-the-key-of-a-selected-value-from-a-dropdown-in-reactjs
 import axios from 'axios';
-//import Select from 'react-virtualized-select';
-import Select from 'react-select';
-import {Line} from 'react-chartjs-2';
-import PlotComponent from './PlotComponent';
-
 import 'react-select/dist/react-select.css';
-//import ' react-virtualized/styles.css'
-//import 'react-virtualized-select/styles.css'
+import PlotComponent from './PlotComponent';
+import Select from 'react-select';
 
 
 
 
-class App extends Component {
+class MainDisplayComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -27,10 +18,10 @@ class App extends Component {
       convertedPrice: 0,
       cryptoCurrentPrice: 0,
       coinlist: [{value: 0, label: "Loading..."}],
-      defaultCoinlist: [{value: 0, label: "Bitcoin (BTC)"}],
       currencylist: [{value: 0, label: "USD"}, {value: 0, label: "EUR"}],
       inputValue:"",
-      flipDropdown: false 
+      flipDropdown: false,
+      coinFullName: ""
      }
    }
 
@@ -60,7 +51,7 @@ class App extends Component {
 
       
       // add those full coin names to obj 
-      coins_full_name.sort().map((currElement, index) => {
+      coins_full_name.sort().forEach((currElement, index) => {
         obj.push({value: index, label: currElement.replace(/\*/g, '').trim()})
         //console.log("key",index, "value", currElement)
       });
@@ -71,7 +62,7 @@ class App extends Component {
     }, 1000)
   }
 
-
+  // make API request before rendering page 
   componentDidMount () {
     this.getData()
   }
@@ -79,36 +70,34 @@ class App extends Component {
   handleChangeFromCrypto = (element) => {
     
 
-    console.log(element, 'handle change from crypto')
+    //console.log(element, 'handle change from crypto')
+
 
     let cryptoSymbol = element.label.split(' ')
     let cryptoSymbolSplit = cryptoSymbol[cryptoSymbol.length-1].replace(')', '').replace('(', '')
     //console.log(cryptoSymbolSplit ,'from app.js')
-    this.setState({initFromCurrency: element, inputValue: cryptoSymbolSplit  }); 
-
-
-
-    // if you do element.label then list item chosen won't appear in text box... 
+    this.setState({
+      initFromCurrency: element, 
+      inputValue: cryptoSymbolSplit,
+      coinFullName: element.label.split('(')[0]
+    }); 
   }
+
 
   handleChangeToCurrency= (element) => {
-
     this.setState({initToCurrency: element});
-    // if you do element.label then list item chosen won't appear in text box... 
-
   }
+
 
   update_amount_to_convert = (e) => {
     this.setState({moneyToConvert: e.target.value}, this.handleClick)
-    //console.log(e.target.value)
-
-     //this.setState({moneyToConvert: parseInt(e.target.value)},this.handleClick1);
   }
+
 
   handleClick = () => {
 
     let crypto = this.state.initFromCurrency.label.match(/\(([^)]+)\)/)[1]
-    let cryptoSymbol = this.state.initFromCurrency.label.match(/\(([^)]+)\)/)[0].replace('(', '',).replace( ')', '')
+    //let cryptoSymbol = this.state.initFromCurrency.label.match(/\(([^)]+)\)/)[0].replace('(', '',).replace( ')', '')
 
     let curr = this.state.initToCurrency.label
     let amount = this.state.moneyToConvert
@@ -120,7 +109,7 @@ class App extends Component {
 
     axios.get(url)
       .then(res => {
-        let curr_to_dollars = res.data[curr] * parseInt(amount)
+        let curr_to_dollars = res.data[curr] * parseInt(amount, 10)
         console.log(res.data[curr])
         this.setState({
                       convertedPrice: curr_to_dollars.toLocaleString(), 
@@ -129,14 +118,20 @@ class App extends Component {
       })
   }
 
+
   handleFlip = () => {
     this.setState({flipDropdown: !this.state.flipDropdown})
   }
 
 
+  clearableCrypto = () => {
+    this.setState({initFromCurrency: ''})
+  }
 
 
-
+  clearableCurr = () => {
+    this.setState({initToCurrency: ''})
+  }
 
 
 
@@ -153,12 +148,14 @@ class App extends Component {
           <h4> <label > From Cryptocurrency <br /> 
            <Select
             name="form-field-name"
-            value={this.state.initFromCurrency}
+            value={this.state.initFromCurrency || ''}
             options={options}
             onChange={this.handleChangeFromCrypto}
-            placeholder="From..."
+            // clearable={false}
+            // placeholder="From..."
+            clearable={false}
           />
-
+          <button onClick={this.clearableCrypto}> Clear </button>
           </label> </h4>
           )
       }
@@ -174,12 +171,13 @@ class App extends Component {
           <h4> <label > To Currency <br /> 
            <Select
             name="form-field-name"
-            value={this.state.initToCurrency || ''}
+            value={this.state.initToCurrency}
             options={options}
             onChange={this.handleChangeToCurrency}
-            placeholder= "...To"
+            // placeholder= "...To"
+            clearable={false}
           />
-
+          <button onClick={this.clearableCurr}> Clear </button>
           </label> </h4>
           )
       }
@@ -188,18 +186,19 @@ class App extends Component {
    
 
 
-
-
-
+ 
 
     return (
 
-
-      <div className="content"> 
+            <div className="content"> 
 
         <h4> <label > Enter an Amount <br />
           <input value={this.state.moneyToConvert} onChange={this.update_amount_to_convert} />
         </label> </h4>
+
+
+
+
 
         {!this.state.flipDropdown ? 
 
@@ -251,17 +250,18 @@ class App extends Component {
 
           
 
-
         <PlotComponent
           inputValue={this.state.inputValue}
+          coinFullName={this.state.coinFullName}
          />
 
 
       </div>
 
 
+
     );
   }
 }
 
-export default App;
+export default MainDisplayComponent;

@@ -1,16 +1,9 @@
 import React, { Component } from 'react';
-import './App.css';
-//import SimpleCard from './SimpleCard';
-//import Dropdown from './Dropdown';
-//https://stackoverflow.com/questions/40777325/how-to-get-the-key-of-a-selected-value-from-a-dropdown-in-reactjs
 import axios from 'axios';
-//import Select from 'react-virtualized-select';
-import Select from 'react-select';
 import {Line} from 'react-chartjs-2';
-
 import 'react-select/dist/react-select.css';
-//import ' react-virtualized/styles.css'
-//import 'react-virtualized-select/styles.css'
+import '../Styles/PlotComponent.css';
+
 
   const monthsDict = {
     1: 31,
@@ -57,7 +50,7 @@ class PlotComponent extends Component {
 
 
 
-
+  // does what it says    
   getPrev30Days = (dateStr, currYear) => {
   // get previous 30 days from today's date 
   // TAKE ARG FORMATTED LIKE '6 2' AND CHANGES IT TO '06 02' and returns array of previous 30 days depending on month 
@@ -113,7 +106,7 @@ class PlotComponent extends Component {
     let currMonthDaysArr = []
     for (var j=1; j <= currDay; j++) {
       const elem = j.toString()
-      if (elem.length == 1) {
+      if (elem.length === 1) {
         let monthDate = `${currYear}.${month}.0${j}`
         currMonthDaysArr.push(monthDate)
       } else {
@@ -150,7 +143,7 @@ class PlotComponent extends Component {
     }
 
     let firstDayUnix = finalArr[whichDate]
-    let lastDayUnix = finalArr[whichDate]
+    //let lastDayUnix = finalArr[whichDate]
 
 
     let firstDayUnixYear = firstDayUnix.split('.')[0]
@@ -165,10 +158,12 @@ class PlotComponent extends Component {
   }
 
 
-
+  // using unix timestamps -- makes API request for previous 30 days of cryptocurrency searched
   requestPlotData = (unixFormat, plotTitle) => {
 
     let coin = this.props.inputValue
+
+    let longCoinName = this.props.coinFullName
     console.log(coin, 'im in PlotComponent')
     let url = 'https://min-api.cryptocompare.com/data/pricehistorical?fsym=' + coin + '&tsyms=USD,EUR&ts='
 
@@ -201,10 +196,18 @@ class PlotComponent extends Component {
       
     }
     
-    let dataObj = { labels: unixFormat, 
+
+    // unixFormat[0] = 'year.month.day'
+    let fullMonthNames = unixFormat.map((i, idx) => {
+      let sp = i.split('.')
+      return `${monthNamesDict[sp[1] * 1]} ${sp[2]}, ${sp[0]}`
+    })
+
+
+    let dataObj = { labels: fullMonthNames, 
       datasets: [
         {
-          label: 'Price of ' + coin + ' from ' + plotTitle,
+          label: 'Price of ' + longCoinName + ' from ' + plotTitle,
           fill: true,
           lineTension: 0.1,
           backgroundColor: 'rgba(75,192,192,0.4)',
@@ -231,7 +234,7 @@ class PlotComponent extends Component {
 
   }
 
-
+  // combined all functions above & plots data 
   makePlot = () =>  {
   // onClick function for click for plot button 
 
@@ -269,14 +272,11 @@ class PlotComponent extends Component {
 
  
 
-
-
-
     return (
 
 
       <div> 
-        <button onClick={this.makePlot}> make plot! </button>
+        <button onClick={this.makePlot}> 30-day plot </button>
         {!this.state.plotButtonBool ? null: <div className="line-chart"> <Line data={data} /> </div>}
       </div>
 
