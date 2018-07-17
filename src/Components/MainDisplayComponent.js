@@ -190,16 +190,16 @@ class MainDisplayComponent extends Component {
 
     return (
 
-            <div className="content"> 
+        <div className="content"> 
 
-        <h4> <label > Enter an Amount <br />
-          <input value={this.state.moneyToConvert} onChange={this.update_amount_to_convert} />
-        </label> </h4>
-
-
+          <h4> <label > Enter an Amount <br />
+            <input value={this.state.moneyToConvert} onChange={this.update_amount_to_convert} />
+          </label> </h4>
 
 
 
+
+        {/* if condition ? true : false  */}
         {!this.state.flipDropdown ? 
 
         <div className="wrapper"> 

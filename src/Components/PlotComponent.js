@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import {Line} from 'react-chartjs-2';
 import 'react-select/dist/react-select.css';
-import '../Styles/PlotComponent.css';
+import '../Styles/Plot.css';
 
 
   const monthsDict = {
